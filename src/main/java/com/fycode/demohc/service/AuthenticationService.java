@@ -69,6 +69,7 @@ public class AuthenticationService {
 
         if (!authenticated)
             throw new AppException(ErrorCode.UNAUTHENTICATED);
+
         var token = generateToken(user);
 
         return AuthenticationResponse.builder()
@@ -82,7 +83,7 @@ public class AuthenticationService {
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getUsername())
-                .issuer("fycode.com")
+                .issuer("devteria.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
@@ -102,6 +103,7 @@ public class AuthenticationService {
             throw new RuntimeException(e);
         }
     }
+
     private String buildScope(User user){
         StringJoiner stringJoiner = new StringJoiner(" ");
         if (!CollectionUtils.isEmpty(user.getRoles()))

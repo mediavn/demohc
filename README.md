@@ -1,4 +1,4 @@
-# Identity service
+# Spring boot service
 This microservice is responsible for:
 * Onboarding users
 * Roles and permissions

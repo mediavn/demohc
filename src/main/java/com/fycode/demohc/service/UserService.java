@@ -8,11 +8,13 @@ import com.fycode.demohc.enums.Role;
 import com.fycode.demohc.exception.AppException;
 import com.fycode.demohc.exception.ErrorCode;
 import com.fycode.demohc.mapper.UserMapper;
+import com.fycode.demohc.repository.RoleRepository;
 import com.fycode.demohc.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -27,12 +29,13 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class UserService {
-
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
     UserRepository userRepository;
-   UserMapper userMapper;
-   PasswordEncoder passwordEncoder;
+    RoleRepository roleRepository;
+    UserMapper userMapper;
+    PasswordEncoder passwordEncoder;
 
     public UserResponse createUser(UserCreationRequest request){
         if (userRepository.existsByUsername(request.getUsername()))
@@ -64,6 +67,10 @@ public class UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         userMapper.updateUser(user, request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        var roles = roleRepository.findAllById(request.getRoles());
+        user.setRoles(new HashSet<>(roles));
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
@@ -73,7 +80,8 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    @PreAuthorize("hasRole('ADMIN')") // chi cho quyen ADMIN vao duoc
+    //@PreAuthorize("hasRole('ADMIN')") // chi cho quyen role ADMIN vao duoc
+    @PreAuthorize("hasAuthority('APPROVE_POST')") // set quyen cho permission
     public List<UserResponse> getUsers(){
         log.info("In method get users");
         return userRepository.findAll().stream()

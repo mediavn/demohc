@@ -1,5 +1,7 @@
 package com.fycode.demohc.dto.request;
 
+import com.fycode.demohc.validator.DobConstraint;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -19,5 +21,8 @@ public class UserCreationRequest {
     String password;
     String firstName;
     String lastName;
+
+    // Custom Annotation @DobConstraint cho trường ngày sinh
+    @DobConstraint(min = 18, message = "INVALID_DOB_MIN") // Custom validation >= 18 tuổi
     LocalDate dob;
 }

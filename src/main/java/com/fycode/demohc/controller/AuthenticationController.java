@@ -1,10 +1,7 @@
 package com.fycode.demohc.controller;
 
 
-import com.fycode.demohc.dto.request.ApiResponse;
-import com.fycode.demohc.dto.request.AuthenticationRequest;
-import com.fycode.demohc.dto.request.IntrospectRequest;
-import com.fycode.demohc.dto.request.LogoutRequest;
+import com.fycode.demohc.dto.request.*;
 import com.fycode.demohc.dto.response.AuthenticationResponse;
 import com.fycode.demohc.dto.response.IntrospectResponse;
 import com.fycode.demohc.service.AuthenticationService;
@@ -42,6 +39,16 @@ public class AuthenticationController {
                 .result(result)
                 .build();
     }
+
+    @PostMapping("/refresh")
+    ApiResponse<AuthenticationResponse> authenticate(@RequestBody RefreshRequest request)
+            throws ParseException, JOSEException {
+        var result = authenticationService.refreshToken(request);
+        return ApiResponse.<AuthenticationResponse>builder()
+                .result(result)
+                .build();
+    }
+
     @PostMapping("/logout")
     ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
         authenticationService.logout(request);
